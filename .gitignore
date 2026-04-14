@@ -5,6 +5,7 @@
 # Secrets and environment overrides
 .env
 .env.*
+!.env.example
 *.secret
 
 # Grafana runtime
