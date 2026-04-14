@@ -2,7 +2,7 @@
 
 Repository ini merapikan komponen monitoring internet Organization X yang berbasis:
 
-- Huawei Firewall via SNMP
+- Huawei Firewall USG6555F via SNMP
 - Prometheus untuk scraping metric dan rule evaluation
 - Blackbox Exporter untuk pengecekan konektivitas internet per ISP
 - Grafana untuk dashboard visualisasi
