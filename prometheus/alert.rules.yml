@@ -1,0 +1,103 @@
+# Alert untuk memantau dua hal utama:
+# 1. apakah link fisik tiap ISP sedang UP atau DOWN,
+# 2. apakah internet tiap ISP bisa diakses ketika link fisik masih UP.
+#
+# Tambahan alert downstream rendah dipakai sebagai indikator
+# trafik sangat kecil atau potensi anomali operasional.
+
+groups:
+  - name: isp-blackbox
+    rules:
+      # ISP_A: interface fisik pada firewall turun.
+      - alert: ISP_A_Link_Down
+        expr: ifOperStatus{job="snmp_firewall", instance="firewall.example.internal", ifName="INTERFACE_A"} != 1
+        for: 1m
+        labels:
+          severity: critical
+          isp: ISP_A
+          type: link
+        annotations:
+          summary: "🔴 ISP_A Link DOWN"
+          description: >
+            Interface INTERFACE_A di firewall.example.internal terdeteksi DOWN lebih dari 1 menit.
+            Periksa kabel, port, status interface, dan perangkat firewall.
+
+      # ISP_A: internet gagal diping sementara link fisik masih aktif.
+      - alert: ISP_A_Internet_Down
+        expr: |
+          (max(probe_success{job="blackbox_isp_a"}) == 0)
+          and on() (ifOperStatus{job="snmp_firewall", instance="firewall.example.internal", ifName="INTERFACE_A"} == bool 1)
+        for: 1m
+        labels:
+          severity: critical
+          isp: ISP_A
+          type: internet
+        annotations:
+          summary: "🔴 ISP_A Internet DOWN (Link UP)"
+          description: >
+            Probe internet gagal lebih dari 1 menit sementara interface INTERFACE_A masih UP.
+            Ini biasanya mengarah ke masalah upstream, routing, atau gangguan ISP.
+
+      # ISP_B: interface fisik pada firewall turun.
+      - alert: ISP_B_Link_Down
+        expr: ifOperStatus{job="snmp_firewall", instance="firewall.example.internal", ifName="INTERFACE_B"} != 1
+        for: 1m
+        labels:
+          severity: critical
+          isp: ISP_B
+          type: link
+        annotations:
+          summary: "🔴 ISP_B Link DOWN"
+          description: >
+            Interface INTERFACE_B di firewall.example.internal terdeteksi DOWN lebih dari 1 menit.
+            Periksa kabel, port, status interface, dan perangkat firewall.
+
+      # ISP_B: internet gagal diping sementara link fisik masih aktif.
+      - alert: ISP_B_Internet_Down
+        expr: |
+          (max(probe_success{job="blackbox_isp_b"}) == 0)
+          and on() (ifOperStatus{job="snmp_firewall", instance="firewall.example.internal", ifName="INTERFACE_B"} == bool 1)
+        for: 1m
+        labels:
+          severity: critical
+          isp: ISP_B
+          type: internet
+        annotations:
+          summary: "🔴 ISP_B Internet DOWN (Link UP)"
+          description: >
+            Probe internet gagal lebih dari 1 menit sementara interface INTERFACE_B masih UP.
+            Ini biasanya mengarah ke masalah upstream, routing, atau gangguan ISP.
+
+      # ISP_A: downstream sangat rendah.
+      # Karena kapasitas ISP_A adalah 200 Mbps, nilai di bawah 5% berarti kurang dari 10 Mbps.
+      - alert: ISP_A_Downstream_Low
+        expr: |
+          ((rate(ifHCInOctets{job="snmp_firewall", instance="firewall.example.internal", ifName="INTERFACE_A"}[5m]) * 8) / 200e6 * 100) < 5
+        for: 2m
+        labels:
+          severity: warning
+          isp: ISP_A
+          type: utilization
+        annotations:
+          summary: "🟡 ISP_A Downstream LOW (<5%)"
+          description: >
+            Trafik downstream ISP_A rendah selama 2 menit.
+            Nilai saat ini: {{ $value | printf "%.1f" }}%.
+            Bisa berarti trafik memang sepi, tetapi juga bisa menjadi sinyal awal anomali.
+
+      # ISP_B: downstream sangat rendah.
+      # Karena kapasitas ISP_B juga 200 Mbps, nilai di bawah 5% berarti kurang dari 10 Mbps.
+      - alert: ISP_B_Downstream_Low
+        expr: |
+          ((rate(ifHCInOctets{job="snmp_firewall", instance="firewall.example.internal", ifName="INTERFACE_B"}[5m]) * 8) / 200e6 * 100) < 5
+        for: 2m
+        labels:
+          severity: warning
+          isp: ISP_B
+          type: utilization
+        annotations:
+          summary: "🟡 ISP_B Downstream LOW (<5%)"
+          description: >
+            Trafik downstream ISP_B rendah selama 2 menit.
+            Nilai saat ini: {{ $value | printf "%.1f" }}%.
+            Bisa berarti trafik memang sepi, tetapi juga bisa menjadi sinyal awal anomali.

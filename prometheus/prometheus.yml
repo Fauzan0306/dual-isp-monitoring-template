@@ -1,0 +1,130 @@
+# Konfigurasi utama Prometheus untuk monitoring internet Organization X.
+#
+# File ini menjelaskan:
+# - target mana yang discrape,
+# - bagaimana metric SNMP diambil,
+# - bagaimana probe internet per ISP dijalankan,
+# - rule file apa yang dibaca,
+# - dan ke mana alert dikirim.
+
+global:
+  # Semua metric discrape setiap 15 detik agar dashboard terasa responsif.
+  scrape_interval: 15s
+
+  # Rule alert juga dievaluasi setiap 15 detik.
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Monitoring Prometheus itu sendiri.
+  - job_name: "prometheus"
+    static_configs:
+      - targets:
+          - "prometheus:9090"
+
+  # Monitoring host lokal tempat exporter / service berjalan.
+  - job_name: "node_exporter"
+    static_configs:
+      - targets:
+          - "node-exporter:9100"
+
+  # Contoh target VM lain yang juga dimonitor via Node Exporter.
+  - job_name: "vm"
+    static_configs:
+      - targets:
+          - "monitoring-vm.example.internal:9100"
+
+  # Job SNMP umum untuk perangkat jaringan lain.
+  # Module `if_mib` biasanya dipakai untuk metric interface dasar.
+  - job_name: "snmp"
+    scrape_interval: 30s
+    scrape_timeout: 25s
+    metrics_path: /snmp
+    params:
+      module:
+        - if_mib
+    static_configs:
+      - targets:
+          - "core-router.example.internal"
+    relabel_configs:
+      # Alamat device asli dikirim ke SNMP Exporter sebagai parameter `target`.
+      - source_labels: [__address__]
+        target_label: __param_target
+
+      # Label `instance` dibuat sama dengan target asli agar query lebih mudah dibaca.
+      - source_labels: [__param_target]
+        target_label: instance
+
+      # Prometheus sebenarnya scrape ke SNMP Exporter lokal, bukan langsung ke device.
+      - target_label: __address__
+        replacement: "snmp-exporter:9116"
+
+  # Job SNMP utama untuk firewall Huawei yang dipakai dashboard internet.
+  # Dua interface penting yang dipantau:
+  # - INTERFACE_A = ISP_A
+  # - INTERFACE_B = ISP_B
+  - job_name: "snmp_firewall"
+    scrape_interval: 30s
+    scrape_timeout: 25s
+    metrics_path: /snmp
+    params:
+      module:
+        - fw_if_mib
+    static_configs:
+      - targets:
+          - "firewall.example.internal"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "snmp-exporter:9116"
+
+  # Probe internet untuk jalur ISP_A.
+  # Probe dilakukan via Blackbox Exporter dengan module yang memakai source IP ISP_A.
+  - job_name: "blackbox_isp_a"
+    metrics_path: /probe
+    params:
+      module:
+        - icmp_isp_a
+    static_configs:
+      - targets:
+          - "8.8.8.8"
+          - "1.1.1.1"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "blackbox-exporter:9115"
+
+  # Probe internet untuk jalur ISP_B.
+  # Module berbeda dipakai agar source IP probe keluar dari jalur ISP_B.
+  - job_name: "blackbox_isp_b"
+    metrics_path: /probe
+    params:
+      module:
+        - icmp_isp_b
+    static_configs:
+      - targets:
+          - "9.9.9.9"
+          - "1.0.0.1"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "blackbox-exporter:9115"
+
+rule_files:
+  # Semua alert rule utama disimpan di file terpisah agar lebih mudah dikelola.
+  # Path ini dibuat relatif agar repository lebih mudah dipahami dan dipindahkan.
+  - alert.rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "alertmanager:9093"

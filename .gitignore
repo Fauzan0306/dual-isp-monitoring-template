@@ -1,0 +1,16 @@
+# Local runtime data
+*.db
+*.sqlite
+
+# Secrets and environment overrides
+.env
+.env.*
+*.secret
+
+# Grafana runtime
+grafana.db
+
+# Editor files
+.DS_Store
+*.swp
+*.swo

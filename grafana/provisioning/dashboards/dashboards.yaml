@@ -1,0 +1,17 @@
+# Provisioning dashboard Grafana.
+#
+# Sesuaikan `options.path` dengan lokasi file JSON dashboard di server Grafana.
+# Jika dashboard disalin ke folder lain, ubah path ini sesuai deployment Anda.
+
+apiVersion: 1
+
+providers:
+  - name: dual-isp-monitoring-template
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards

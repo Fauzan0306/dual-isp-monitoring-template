@@ -1,0 +1,650 @@
+{
+  "kind": "Dashboard",
+  "apiVersion": "dashboard.grafana.app/v1beta1",
+  "metadata": {
+    "name": "dual-isp-internet-monitoring",
+    "namespace": "default",
+    "uid": "dual-isp-dashboard-template",
+    "generation": 1,
+    "creationTimestamp": "2026-01-01T00:00:00Z",
+    "annotations": {
+      "grafana.app/saved-from-ui": "Grafana template export"
+    }
+  },
+  "spec": {
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-main"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-GrYlRd"
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 7,
+          "w": 18,
+          "x": 0,
+          "y": 0
+        },
+        "id": 1,
+        "options": {
+          "displayMode": "lcd",
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "maxVizHeight": 300,
+          "minVizHeight": 16,
+          "minVizWidth": 8,
+          "namePlacement": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showUnfilled": true,
+          "sizing": "auto",
+          "valueMode": "color"
+        },
+        "pluginVersion": "12.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus-main"
+            },
+            "editorMode": "code",
+            "expr": "(rate(ifHCInOctets{job=\"snmp_firewall\", instance=\"firewall.example.internal\", ifName=\"INTERFACE_A\"}[5m]) * 8) / 200e6 * 100",
+            "legendFormat": "Downstream Traffic Percentage",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus-main"
+            },
+            "editorMode": "code",
+            "expr": "(rate(ifHCOutOctets{job=\"snmp_firewall\", instance=\"firewall.example.internal\", ifName=\"INTERFACE_A\"}[5m]) * 8) / 200e6 * 100",
+            "instant": false,
+            "legendFormat": "Upstream Traffic Percentage",
+            "range": true,
+            "refId": "B"
+          }
+        ],
+        "title": "ISP_A Traffic Percentage",
+        "transparent": true,
+        "type": "bargauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-main"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {
+                "options": {
+                  "0": {
+                    "color": "red",
+                    "index": 1,
+                    "text": "ISP_B Internet Down"
+                  },
+                  "1": {
+                    "color": "green",
+                    "index": 0,
+                    "text": "ISP_B Internet Up"
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                }
+              ]
+            },
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 7,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "id": 4,
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "12.4.1",
+        "targets": [
+          {
+            "editorMode": "code",
+            "expr": "max(probe_success{job=\"blackbox_isp_b\"})\r\n* on()\r\n(ifOperStatus{instance=\"firewall.example.internal\", ifName=\"INTERFACE_B\"} == bool 1)\r\n",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "ISP_B Internet",
+        "transparent": true,
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-main"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-GrYlRd"
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 7,
+          "w": 18,
+          "x": 0,
+          "y": 7
+        },
+        "id": 2,
+        "options": {
+          "displayMode": "lcd",
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "maxVizHeight": 300,
+          "minVizHeight": 16,
+          "minVizWidth": 8,
+          "namePlacement": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showUnfilled": true,
+          "sizing": "auto",
+          "valueMode": "color"
+        },
+        "pluginVersion": "12.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus-main"
+            },
+            "editorMode": "code",
+            "expr": "(rate(ifHCInOctets{job=\"snmp_firewall\", instance=\"firewall.example.internal\", ifName=\"INTERFACE_B\"}[5m]) * 8) / 200e6 * 100",
+            "legendFormat": "Downstream Traffic Percentage",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus-main"
+            },
+            "editorMode": "code",
+            "expr": "(rate(ifHCOutOctets{job=\"snmp_firewall\", instance=\"firewall.example.internal\", ifName=\"INTERFACE_B\"}[5m]) * 8) / 200e6 * 100",
+            "instant": false,
+            "legendFormat": "Upstream Traffic Percentage",
+            "range": true,
+            "refId": "B"
+          }
+        ],
+        "title": "ISP_B Traffic Percentage",
+        "transparent": true,
+        "type": "bargauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-main"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {
+                "options": {
+                  "0": {
+                    "color": "red",
+                    "index": 1,
+                    "text": "ISP_A Internet Down"
+                  },
+                  "1": {
+                    "color": "green",
+                    "index": 0,
+                    "text": "ISP_A Internet Up"
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                }
+              ]
+            },
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 7,
+          "w": 6,
+          "x": 18,
+          "y": 7
+        },
+        "id": 3,
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "12.4.1",
+        "targets": [
+          {
+            "editorMode": "code",
+            "expr": "max(probe_success{job=\"blackbox_isp_a\"})\r\n* on()\r\n(ifOperStatus{instance=\"firewall.example.internal\", ifName=\"INTERFACE_A\"} == bool 1)\r\n",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "ISP_A Internet",
+        "transparent": true,
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-main"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "displayName": "ISP_A Download Bandwidth",
+            "mappings": [],
+            "max": 200,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 150
+                },
+                {
+                  "color": "red",
+                  "value": 190
+                }
+              ]
+            },
+            "unit": "Mbits"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 14
+        },
+        "id": 5,
+        "options": {
+          "minVizHeight": 75,
+          "minVizWidth": 75,
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true,
+          "sizing": "auto"
+        },
+        "pluginVersion": "12.4.1",
+        "targets": [
+          {
+            "editorMode": "code",
+            "expr": "rate(ifHCInOctets{job=\"snmp_firewall\", instance=\"firewall.example.internal\", ifName=\"INTERFACE_A\"}[5m]) * 8 / 1e6",
+            "legendFormat": "ISP_A Download",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "ISP_A Download Bandwidth",
+        "transparent": true,
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-main"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "displayName": "ISP_A Upload Bandwidth",
+            "mappings": [],
+            "max": 200,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 150
+                },
+                {
+                  "color": "red",
+                  "value": 190
+                }
+              ]
+            },
+            "unit": "Mbits"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 14
+        },
+        "id": 6,
+        "options": {
+          "minVizHeight": 75,
+          "minVizWidth": 75,
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true,
+          "sizing": "auto"
+        },
+        "pluginVersion": "12.4.1",
+        "targets": [
+          {
+            "editorMode": "code",
+            "expr": "rate(ifHCOutOctets{job=\"snmp_firewall\", instance=\"firewall.example.internal\", ifName=\"INTERFACE_A\"}[5m]) * 8 / 1e6",
+            "legendFormat": "ISP_A Upload",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "ISP_A Upload Bandwidth",
+        "transparent": true,
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-main"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "displayName": "ISP_B Download Bandwidth",
+            "mappings": [],
+            "max": 200,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 150
+                },
+                {
+                  "color": "red",
+                  "value": 190
+                }
+              ]
+            },
+            "unit": "Mbits"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 14
+        },
+        "id": 7,
+        "options": {
+          "minVizHeight": 75,
+          "minVizWidth": 75,
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true,
+          "sizing": "auto"
+        },
+        "pluginVersion": "12.4.1",
+        "targets": [
+          {
+            "editorMode": "code",
+            "expr": "rate(ifHCInOctets{job=\"snmp_firewall\", instance=\"firewall.example.internal\", ifName=\"INTERFACE_B\"}[5m]) * 8 / 1e6",
+            "legendFormat": "ISP_B Download",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "ISP_B Download Bandwidth",
+        "transparent": true,
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus-main"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "displayName": "ISP_B Upload Bandwidth",
+            "mappings": [],
+            "max": 200,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 150
+                },
+                {
+                  "color": "red",
+                  "value": 190
+                }
+              ]
+            },
+            "unit": "Mbits"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 14
+        },
+        "id": 8,
+        "options": {
+          "minVizHeight": 75,
+          "minVizWidth": 75,
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true,
+          "sizing": "auto"
+        },
+        "pluginVersion": "12.4.1",
+        "targets": [
+          {
+            "editorMode": "code",
+            "expr": "rate(ifHCOutOctets{job=\"snmp_firewall\", instance=\"firewall.example.internal\", ifName=\"INTERFACE_B\"}[5m]) * 8 / 1e6",
+            "legendFormat": "ISP_B Upload",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "ISP_B Upload Bandwidth",
+        "transparent": true,
+        "type": "gauge"
+      }
+    ],
+    "preload": false,
+    "schemaVersion": 42,
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-5m",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "DUAL ISP INTERNET MONITORING",
+    "weekStart": "",
+    "version": 1
+  },
+  "status": {}
+}

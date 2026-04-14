@@ -1,0 +1,29 @@
+# Konfigurasi Blackbox Exporter untuk monitoring internet per ISP.
+#
+# Ide utamanya:
+# - ISP_A dan ISP_B diprobe dengan source IP yang berbeda.
+# - Dengan begitu, hasil `probe_success` benar-benar mewakili jalur yang diuji.
+
+modules:
+  # Module probe ICMP umum.
+  # Boleh dipakai untuk troubleshooting manual jika diperlukan.
+  icmp:
+    prober: icmp
+
+  # Probe ICMP untuk jalur ISP_A.
+  # Source IP ini sebaiknya merupakan IP yang keluar melalui interface ISP_A.
+  icmp_isp_a:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: ip4
+      source_ip_address: 192.0.2.62
+
+  # Probe ICMP untuk jalur ISP_B.
+  # Source IP ini sebaiknya merupakan IP yang keluar melalui interface ISP_B.
+  icmp_isp_b:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: ip4
+      source_ip_address: 192.0.2.63

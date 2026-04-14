@@ -1,0 +1,17 @@
+# Provisioning datasource Grafana untuk dashboard monitoring internet.
+#
+# UID datasource dibuat sama dengan UID yang sudah dipakai dashboard export,
+# sehingga dashboard bisa langsung menemukan datasource yang benar.
+
+apiVersion: 1
+
+datasources:
+  - name: prometheus
+    type: prometheus
+    access: proxy
+    uid: prometheus-main
+    url: http://prometheus.example.internal:9090/
+    isDefault: true
+    editable: true
+    jsonData:
+      pdcInjected: false
