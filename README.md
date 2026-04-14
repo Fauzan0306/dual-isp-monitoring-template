@@ -7,6 +7,8 @@ Repository ini merapikan komponen monitoring internet Organization X yang berbas
 - Blackbox Exporter untuk pengecekan konektivitas internet per ISP
 - Grafana untuk dashboard visualisasi
 
+Repository ini juga sudah disiapkan agar bisa dijalankan dengan Docker Compose.
+
 Fokus repository ini adalah monitoring dua link internet:
 
 - ISP_A pada interface `INTERFACE_A`
@@ -22,6 +24,51 @@ Repository ini sudah disanitasi untuk kebutuhan dokumentasi dan GitHub:
 - community SNMP diganti placeholder.
 - URL datasource Grafana diganti placeholder.
 - file ini dimaksudkan sebagai template yang mudah dipahami, bukan salinan mentah dari server produksi.
+
+## Menjalankan Dengan Docker
+
+Stack ini bisa dijalankan dengan Docker Compose agar user lain lebih mudah mencoba atau mengadaptasinya.
+
+Komponen yang akan dijalankan:
+
+- Prometheus
+- Grafana
+- Alertmanager
+- SNMP Exporter
+- Blackbox Exporter
+- Node Exporter
+
+File yang dipakai:
+
+- `docker-compose.yml`
+- `.env.example`
+
+Langkah cepat:
+
+1. Copy `.env.example` menjadi `.env`
+2. Ubah username dan password Grafana jika diperlukan
+3. Review placeholder pada file:
+   - `prometheus/prometheus.yml`
+   - `prometheus/alert.rules.yml`
+   - `prometheus/blackbox.yml`
+   - `prometheus/snmp.yml`
+   - `grafana/dashboards/dual-isp-internet-monitoring.json`
+4. Jalankan:
+
+```bash
+docker compose up -d
+```
+
+Setelah stack berjalan:
+
+- Grafana: `http://localhost:3000`
+- Prometheus: `http://localhost:9090`
+- Alertmanager: `http://localhost:9093`
+
+Catatan penting:
+
+- template ini akan langsung menjalankan servicenya, tetapi metric nyata baru akan masuk setelah placeholder target, interface, dan SNMP community Anda diganti.
+- `blackbox-exporter` membutuhkan capability `NET_RAW` agar ICMP probe bisa berjalan.
 
 ## Alur Monitoring
 
@@ -154,6 +201,8 @@ Supaya pembaca tidak bingung, urutan setup stack ini idealnya seperti berikut:
 
 8. Verifikasi end-to-end
    Pastikan metric SNMP masuk, probe blackbox sukses, alert rules berjalan, dan semua panel di Grafana menampilkan data.
+
+Jika menggunakan Docker Compose, langkah 2 sampai 7 tetap berlaku, hanya deployment servicenya disederhanakan lewat satu file compose.
 
 ## Ringkasan Data Flow
 

@@ -10,7 +10,9 @@ datasources:
     type: prometheus
     access: proxy
     uid: prometheus-main
-    url: http://prometheus.example.internal:9090/
+    # Dalam mode Docker Compose, service Prometheus bisa diakses langsung
+    # lewat nama service `prometheus` pada network internal Docker.
+    url: http://prometheus:9090/
     isDefault: true
     editable: true
     jsonData:
